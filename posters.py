@@ -8,7 +8,7 @@ def get_random_url_from_feed(feed_url):
     feeds = parse(feed_url)['entries']
     html = choice([feed.content[0].value for feed in feeds if len(feed.content) > 0])
     soup = BeautifulSoup(html)
-    img = soup.find(itemprop="image")
+    img = soup.find("img")
     return img['src']
 
 class Posters(BotPlugin):
