@@ -1,20 +1,15 @@
 from random import choice
 from feedparser import parse
+from bs4 import BeautifulSoup
 import re
-
-# Backward compatibility
-from errbot.version import VERSION
-from errbot.utils import version2array
-if version2array(VERSION) >= [1,6,0]:
-    from errbot import botcmd, BotPlugin
-else:
-    from errbot.botplugin import BotPlugin
-    from errbot.jabberbot import botcmd
+from errbot import botcmd, BotPlugin
 
 def get_random_url_from_feed(feed_url):
     feeds = parse(feed_url)['entries']
-    html = choice([feed.content[0].value for feed in feeds if len(feed.content)>0])
-    return re.search(r'.*src="(.*\.(jpg|png))".*',html).group(1) # find the first thing that matches an image
+    html = choice([feed.content[0].value for feed in feeds if len(feed.content) > 0])
+    soup = BeautifulSoup(html)
+    img = soup.find(itemprop="image")
+    return img['src']
 
 class Posters(BotPlugin):
 
@@ -24,7 +19,7 @@ class Posters(BotPlugin):
             There ! I fixed it !
             from http://thereifixedit.files.wordpress.com/
         """
-        return {'content':'There I fixed it !', 'url':get_random_url_from_feed('http://feeds.feedburner.com/ThereIFixedIt')}
+        return {'content':'There I fixed it !', 'url':get_random_url_from_feed('http://feeds.feedburner.com/ThereIFixedIt') + '?t=.jpg'}
 
     @botcmd(template='showme')
     def wtf(self, mess, args):
@@ -32,4 +27,4 @@ class Posters(BotPlugin):
         (De)motivates you
         from VeryDemotivational
         """
-        return {'content':'Very demotivational !', 'url':get_random_url_from_feed('http://feeds.feedburner.com/VeryDemotivational')}
+        return {'content':'Very demotivational !', 'url':get_random_url_from_feed('http://feeds.feedburner.com/VeryDemotivational') + '?t=.jpg'}
