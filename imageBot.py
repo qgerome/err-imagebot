@@ -13,17 +13,24 @@ else:
 
 from urllib2 import urlopen, Request, quote
 import json
-from lxml import objectify
+
 
 from bs4 import BeautifulSoup
+
+GOOGLE_IMAGE_URL = ('https://ajax.googleapis.com/ajax/services/search/images?' +
+                    'v=1.0&q=%s&userip=%s')
+
+from lxml import objectify
+from urllib2 import urlopen
+import re
 
 def extract_rss_urls(feed_url):
     rss_content = urlopen(feed_url).read()
     rss = objectify.fromstring(rss_content)
     return [re.search('src=\"(.+?)\"', description.text).groups()[0] for description in rss.xpath("//item/description")]
 
-GOOGLE_IMAGE_URL = ('https://ajax.googleapis.com/ajax/services/search/images?' +
-                    'v=1.0&q=%s&userip=%s')
+
+
 
 class ImageBot(BotPlugin):
     def callback_connect(self):
